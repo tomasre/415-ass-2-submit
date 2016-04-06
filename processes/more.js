@@ -1,24 +1,27 @@
 /**
- * more.js
- * 'more' command for CLI
- * Created by Matt Kindblad on 03/29/2016.
- *All of the code for opening and reading the file copied from ContactManager.js
- *When end of file reach, 'END' string passed back instead of page object.
- * Tested page creation and page/line advancing
- * on 03/30/2016, works properly; still need to test
- * opening and reading of file (all code from ContactManager.js)
+  * more.js
+  
+  * 'more' command for CLI
+  * Created by Matt Kindblad on 03/29/2016.
+  
+  *All of the code for opening and reading the file copied from ContactManager.js
+  *When end of file reach, 'END' string passed back instead of page object.
+  
+  * Tested page creation and page/line advancing 
+  * on 03/30/2016, works properly; still need to test
+  * opening and reading of file (all code from ContactManager.js)
  */
 
 'use strict';
 (function() {
 	/*var options = {
-	 stdout: true,
-	 stdin: moreListener
-	 }; */
+		stdout: true,
+		stdin: moreListener
+	}; */
 	var moreManual = "Use the command 'more [filename]' to open a file.  When displaying the file, type 'l' to advance" +
 		" one line at a time, type 'p' to advance one page at a time, and type 'exit' to exit back to command line.";
 	os.ps.register('more', more, {stdout: true, stdin: moreListener}, moreManual);
-
+	
 	var stdout;
 	var stdin;
 	var page = {currentLines: [], allLines: "", ptrFirstLine: 0, ptrLastLine: 8};
@@ -27,7 +30,7 @@
 	var pageLines = 25;
 	var finalLines;
 	var source;
-
+	
 	function more(options, argv) {
 		stdout = options.stdout;
 		source;
@@ -53,7 +56,7 @@
 							console.log('\n');
 							callback('Error');
 						}
-						else {
+					else {
 							callback(null, length);
 						}
 
@@ -234,53 +237,53 @@
 	}
 
 
-	// l pressed; advance one line
-	function advanceLine(thePage) {
-		/*
-		 // If we're on the last page and there are still lines on the page, move only the first line ptr
-		 if (thePage.ptrLastLine + 1 > thePage.allLines.length - 1 && thePage.currentLines.length > 1) {
-		 thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 1, thePage.ptrLastLine);
-		 thePage.ptrFirstLine++;
-		 }
-		 */
-		// If we're on the last page and there's only one line left, send a message to end the display of the file
-		if (thePage.ptrLastLine + 1 > thePage.allLines.length - 1) {
-			stdout.appendToBuffer("more file " + source + " closed");
-			thePage = 'END';
-		}
-		// Otherwise shift the page by one line
-		else {
-			thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 1, thePage.ptrLastLine + 2);
-			thePage.ptrFirstLine++;
-			thePage.ptrLastLine++;
+		// l pressed; advance one line
+		function advanceLine(thePage) {
+			/*
+			// If we're on the last page and there are still lines on the page, move only the first line ptr
+			if (thePage.ptrLastLine + 1 > thePage.allLines.length - 1 && thePage.currentLines.length > 1) {
+				thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 1, thePage.ptrLastLine);
+				thePage.ptrFirstLine++;
+			}
+			*/
+			// If we're on the last page and there's only one line left, send a message to end the display of the file
+			if (thePage.ptrLastLine + 1 > thePage.allLines.length - 1) {
+				stdout.appendToBuffer("more file " + source + " closed");
+				thePage = 'END';
+			}
+			// Otherwise shift the page by one line
+			else {
+				thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 1, thePage.ptrLastLine + 2);
+				thePage.ptrFirstLine++;
+				thePage.ptrLastLine++;
+			}
+
+			return thePage;
 		}
 
-		return thePage;
-	}
+		// p pressed; advance one page
+		function advancePage(thePage) {
+			// If we're already on the last page, send a message to end the display of the file
+			if (thePage.ptrLastLine == thePage.allLines.length - 1) {
+				stdout.appendToBuffer("more file " + source + " closed");
+				console.log("advancePage ENDS");
+				thePage = 'END';
+			}
+			// If the next page is the last line, only display up to the last line
+			else if (thePage.ptrLastLine + 25 > thePage.allLines.length - 1) {
+				thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 25, thePage.allLines.length);
+				thePage.ptrFirstLine += 25;
+				thePage.ptrLastLine = thePage.allLines.length - 1;
+			}
+			// Otherwise load the next page
+			else {
+				thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 25, thePage.ptrLastLine + 26);
+				thePage.ptrFirstLine += 25;
+				thePage.ptrLastLine += 25;
+			}
 
-	// p pressed; advance one page
-	function advancePage(thePage) {
-		// If we're already on the last page, send a message to end the display of the file
-		if (thePage.ptrLastLine == thePage.allLines.length - 1) {
-			stdout.appendToBuffer("more file " + source + " closed");
-			console.log("advancePage ENDS");
-			thePage = 'END';
+			return thePage;
 		}
-		// If the next page is the last line, only display up to the last line
-		else if (thePage.ptrLastLine + 25 > thePage.allLines.length - 1) {
-			thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 25, thePage.allLines.length);
-			thePage.ptrFirstLine += 25;
-			thePage.ptrLastLine = thePage.allLines.length - 1;
-		}
-		// Otherwise load the next page
-		else {
-			thePage.currentLines = thePage.allLines.slice(thePage.ptrFirstLine + 25, thePage.ptrLastLine + 26);
-			thePage.ptrFirstLine += 25;
-			thePage.ptrLastLine += 25;
-		}
-
-		return thePage;
-	}
 
 	function displayPage(thePage) {
 		var totalLines = thePage.ptrLastLine - thePage.ptrFirstLine + 1;
@@ -297,16 +300,16 @@
 				console.log("advanceLine ENDS");
 				page = {currentLines: [], allLines: "", ptrFirstLine: 0, ptrLastLine: 24};
 				os._internals.drivers.keyboard.deregisterStream();
-			}
+			}		
 			else
 				displayPage(page);
-		}
+		}			
 		else if (buf === "dummy@OS $ p") {
 			page = advancePage(page);
 			if(page == 'END') {
 				page = {currentLines: [], allLines: "", ptrFirstLine: 0, ptrLastLine: 24};
 				os._internals.drivers.keyboard.deregisterStream();
-			}
+			}	
 			else
 				displayPage(page);
 		}
@@ -315,7 +318,7 @@
 			stdout.appendToBuffer("more file " + source + " closed");
 			os._internals.drivers.keyboard.deregisterStream();
 		}
-
+			
 	}
 
 })();
