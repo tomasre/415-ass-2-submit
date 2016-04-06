@@ -56,7 +56,7 @@
                 //os.ps.register('vectorcalculator', os.bin.vectorcalculator);
                 stdout.appendToBuffer('Running VectorCalculator.js');
                 break;
-
+                
             // for now hardcoded
             case "drivertest":
                 os._internals.ps.copyProcessTableEntryToPCB('DeviceDriverTest');
