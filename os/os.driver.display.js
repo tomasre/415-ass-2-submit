@@ -20,8 +20,12 @@
      */
     function updateDisplay(buffer) {
 
-        /*now just printing to console
-         */ var tempStr = buffer + "<br>";
+        // a bandage
+            if (!document.getElementById('textArea').innerHTML){
+                lines.length=0;
+            }
+
+            var tempStr = buffer + "<br>";
             lines.push(tempStr);
             if(lines.length > 25) {
                 lines.shift();
