@@ -29,6 +29,7 @@
     var pageLines = 25;
     var finalLines;
     var source;
+	var onePage = false;
 
     function more(options, argv) {
         stdout = options.stdout;
@@ -168,23 +169,21 @@
                 lines = fullData.split("\n");
 
                 // Account for the pageWidth, and word-wrap if necessary.
+				/*
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i].length > pageWidth) {
                         lines.splice(i + 1, 0, lines[i].substr(pageWidth, lines[i].length - pageWidth));
                         lines[i] = lines[i].substr(0, pageWidth);
                     }
                 }
-
-                /**
-                 Still need to work out the function calls/callback in my head, if the CLI
-                 will be calling the functions below, might want to make lines static so it
-                 won't be necessary to pass it within the object
-                 */
+				*/
 
                 // 1st page
                 var totalFirstPages = 25;
-                if(lines.length < 25)
-                    totalFirstPages = lines.length;
+                if(lines.length < 25) {
+                    totalFirstPages = lines.length
+					onePage = true;
+				}
                 page.currentLines = lines.slice(0, totalFirstPages);
                 page.allLines = lines;
                 page.ptrFirstLine = 0;
@@ -214,6 +213,7 @@
                     if (errClose === -1) {
                         console.log(msg);
                     } else {
+						console.log("closing more file");
                         console.log(msg);
                         callback(null);
                         console.log(os._internals.fs.disk);
@@ -284,6 +284,12 @@
         for (var i = 0; i < totalLines; i++) {
             stdout.appendToBuffer(thePage.currentLines[i]);
         }
+		// If only one page, close more to give control back to CLI
+		if(onePage) {
+			stdout.appendToBuffer("end of file reached; more file " + source + " closed");
+			page = {currentLines: [], allLines: "", ptrFirstLine: 0, ptrLastLine: 24};
+			os._internals.drivers.keyboard.deregisterStream();
+		}
     }
 
     function moreListener(stream) {
